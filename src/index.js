@@ -9,5 +9,3 @@ connectDB();
 
 
 
-
-//"dev": "nodemon -r dotenv/config --experimental-modules src/index.js"
