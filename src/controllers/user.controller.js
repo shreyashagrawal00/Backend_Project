@@ -65,3 +65,5 @@ return res.status(201).json(
 });
 
 export { registerUSer };
+
+// just for fun
