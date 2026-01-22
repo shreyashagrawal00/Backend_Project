@@ -4,6 +4,23 @@ import {User} from "../models/user.model.js"
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import { ApiResponse } from '../utils/ApiResponse.js';
 
+const generateAccessAndRefereshTokens = async(userId) =>{
+    try {
+        const user = await User.findById(userId)
+        const accessToken = user.generateAccessToken()
+        const refreshToken = user.generateRefreshToken()
+
+        user.refreshToken = refreshToken
+        await user.save({ validateBeforeSave: false })
+
+        return {accessToken, refreshToken}
+
+
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while generating referesh and access token")
+    }
+}
+
 const registerUser = asyncHandler(async (req, res) => {
   const  {username, email, password,fullName}=req.body;
 //console.log("email",email);
@@ -67,5 +84,37 @@ return res.status(201).json(
 
 });
 
-export { registerUser };
+
+const loginUser = asyncHandler(async (req,res)=>{
+
+  const { email , username , password} = req.body;
+
+  if (!username || !email) {
+    throw new ApiError(400,"username or email is required");
+  }
+
+  const user = await User.findOne({
+    $or: [{username} , {email}] 
+  });
+
+  if(!user){
+    throw new ApiError(400,"User does not exist");
+  }
+
+  const isPasswordValid = await user.isPasswordCorrect(password);
+
+  if(!isPasswordValid){
+    throw new ApiError(401,"Password does not exisit");
+  }
+
+  const {accessToken, refreshToken} = await generateAccessAndRefereshTokens(user._id);
+
+
+
+
+
+});
+
+
+export { registerUser , loginUser };
 
