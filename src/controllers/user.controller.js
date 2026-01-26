@@ -84,7 +84,6 @@ return res.status(201).json(
 
 });
 
-
 const loginUser = asyncHandler(async (req,res)=>{
 
   const { email , username , password} = req.body;
