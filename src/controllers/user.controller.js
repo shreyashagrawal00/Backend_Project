@@ -444,7 +444,7 @@ return res
       "Watch history fetched successfully"
     )
 )
-})
+});
 
 
 export 
