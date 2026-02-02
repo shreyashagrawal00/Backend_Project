@@ -90,6 +90,28 @@ const getUserTweets = asyncHandler(async (req, res) => {
 
 const updateTweet = asyncHandler(async (req, res) => {
     //TODO: update tweet
+    const updateTweet = asyncHandler(async (req, res) => {
+  const { tweetId } = req.params
+  const { content } = req.body
+  
+  if (!content.trim()) {
+    throw new ApiError(400, "Content must not be empty");
+  }
+
+  const tweet = await Tweet.findById(tweetId)
+
+  if (!tweet) {
+    throw new ApiError(404, "Tweet not found");
+  }
+
+  if (tweet.owner.equals(req.user._id)) {
+    tweet.content = content
+    const updatedTweet = await tweet.save()
+    await updatedTweet.populate("owner", "username avatar")
+
+    return res.status(200).json(new ApiResponse(200,updatedTweet,"Tweet updated succesfully"))
+  }
+  throw new ApiError(403,"Permission denied")
 })
 
 const deleteTweet = asyncHandler(async (req, res) => {
